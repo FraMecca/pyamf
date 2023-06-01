@@ -7,8 +7,9 @@ Remoting client implementation.
 @since: 0.1
 """
 
-import urllib2
-import urlparse
+import urllib.request
+import urllib.error
+from urllib.parse import urlparse
 
 import pyamf
 from pyamf import remoting
@@ -18,10 +19,7 @@ try:
 except ImportError:
     GzipFile = False
 
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from io import StringIO
+from io import StringIO
 
 
 #: Default user agent is `PyAMF/x.x(.x)`.
@@ -224,7 +222,7 @@ class RemotingService(object):
         self.referer = kwargs.pop('referer', None)
         self.strict = kwargs.pop('strict', False)
         self.logger = kwargs.pop('logger', None)
-        self.opener = kwargs.pop('opener', urllib2.urlopen)
+        self.opener = kwargs.pop('opener', urllib.request.urlopen)
 
         if kwargs:
             raise TypeError('Unexpected keyword arguments %r' % (kwargs,))
@@ -232,7 +230,7 @@ class RemotingService(object):
         self._setUrl(url)
 
     def _setUrl(self, url):
-        self.url = urlparse.urlparse(url)
+        self.url = urlparse(url)
         self._root_url = url
 
         if not self.url[0] in ('http', 'https'):
@@ -285,7 +283,7 @@ class RemotingService(object):
         @rtype: L{ServiceProxy}
         @raise TypeError: Unexpected type for string C{name}.
         """
-        if not isinstance(name, basestring):
+        if not isinstance(name, str):
             raise TypeError('string type required')
 
         return ServiceProxy(self, name, auto_execute)
@@ -398,7 +396,7 @@ class RemotingService(object):
             strict=self.strict
         )
 
-        http_request = urllib2.Request(
+        http_request = urllib.request.Request(
             self._root_url, body.getvalue(),
             self._get_execute_headers()
         )
@@ -425,7 +423,7 @@ class RemotingService(object):
             strict=self.strict
         )
 
-        http_request = urllib2.Request(
+        http_request = urllib.request.Request(
             self._root_url, body.getvalue(),
             self._get_execute_headers()
         )
@@ -446,7 +444,7 @@ class RemotingService(object):
 
         try:
             fbh = self.opener(http_request)
-        except urllib2.URLError, e:
+        except urllib.error.URLError as e:
             if self.logger:
                 self.logger.exception('Failed request for %s', self._root_url)
 

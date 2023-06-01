@@ -8,7 +8,7 @@ General tests.
 """
 
 import unittest
-import new
+import types
 
 import pyamf
 from pyamf.tests.util import ClassCacheClearingTestCase, replace_dict, Spam
@@ -237,7 +237,7 @@ class TypeMapTestCase(unittest.TestCase):
         self.addCleanup(replace_dict, self.tm, pyamf.TYPE_MAP)
 
     def test_add_invalid(self):
-        mod = new.module('spam')
+        mod = types.ModuleType('spam')
         self.assertRaises(TypeError, pyamf.add_type, mod)
         self.assertRaises(TypeError, pyamf.add_type, {})
         self.assertRaises(TypeError, pyamf.add_type, 'spam')
@@ -469,7 +469,7 @@ class PackageTestCase(ClassCacheClearingTestCase):
     def setUp(self):
         ClassCacheClearingTestCase.setUp(self)
 
-        self.module = new.module('foo')
+        self.module = types.ModuleType('foo')
 
         self.module.Classic = self.ClassicType
         self.module.New = self.NewType

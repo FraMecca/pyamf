@@ -6,7 +6,6 @@ Tests for the C{sets} module integration.
 """
 
 import unittest
-import sets
 
 import pyamf
 from pyamf.tests.util import check_buffer
@@ -14,7 +13,7 @@ from pyamf.tests.util import check_buffer
 
 class ImmutableSetTestCase(unittest.TestCase):
     def test_amf0_encode(self):
-        x = sets.ImmutableSet(['1', '2', '3'])
+        x = frozenset(['1', '2', '3'])
 
         self.assertTrue(check_buffer(
             pyamf.encode(x, encoding=pyamf.AMF0).getvalue(), (
@@ -27,7 +26,7 @@ class ImmutableSetTestCase(unittest.TestCase):
         ))
 
     def test_amf3_encode(self):
-        x = sets.ImmutableSet(['1', '2', '3'])
+        x = frozenset(['1', '2', '3'])
 
         self.assertTrue(check_buffer(
             pyamf.encode(x, encoding=pyamf.AMF3).getvalue(), (
