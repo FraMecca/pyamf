@@ -12,7 +12,7 @@ Tests for AMF utilities.
 import unittest
 
 from datetime import datetime
-from StringIO import StringIO
+from io import StringIO
 
 import pyamf
 from pyamf import util
