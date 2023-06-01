@@ -411,7 +411,7 @@ class AdapterTestCase(BaseTestCase):
     """
 
     def test_mapped(self):
-        self.assertNotEquals(None, adapter.class_mapper(User))
+        self.assertNotEqual(None, adapter.class_mapper(User))
         self.assertTrue(adapter.is_class_sa_mapped(User))
 
     def test_instance(self):
