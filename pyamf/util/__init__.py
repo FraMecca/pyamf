@@ -14,10 +14,7 @@ import inspect
 import pyamf
 from pyamf import python
 
-try:
-    from cpyamf.util import BufferedByteStream
-except ImportError:
-    from pyamf.util.pure import BufferedByteStream
+from pyamf.util.pure import BufferedByteStream
 
 
 __all__ = [

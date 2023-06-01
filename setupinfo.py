@@ -9,14 +9,7 @@ import sys
 import os.path
 import fnmatch
 
-try:
-    from Cython.Distutils import build_ext
-
-    have_cython = True
-except ImportError:
-    from setuptools.command.build_ext import build_ext
-
-    have_cython = False
+have_cython = False
 
 
 from setuptools.command import test, sdist
