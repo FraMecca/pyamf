@@ -536,7 +536,7 @@ class Encoder(_Codec):
             return self.writeXML
 
         # check for any overridden types
-        for type_, func in pyamf.TYPE_MAP.iteritems():
+        for type_, func in pyamf.TYPE_MAP.items():
             try:
                 if isinstance(data, type_):
                     return _CustomTypeFunc(self, func)

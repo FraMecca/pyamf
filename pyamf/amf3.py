@@ -1499,7 +1499,7 @@ class Encoder(codec.Encoder):
 
         if definition.encoding == ObjectEncoding.DYNAMIC:
             if attrs:
-                for attr, value in attrs.iteritems():
+                for attr, value in attrs.items():
                     if type(attr) in python.int_types:
                         attr = str(attr)
 

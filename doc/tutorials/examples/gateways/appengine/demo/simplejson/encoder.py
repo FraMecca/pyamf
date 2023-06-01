@@ -233,7 +233,7 @@ class JSONEncoder(object):
             keys.sort()
             items = [(k, dct[k]) for k in keys]
         else:
-            items = dct.iteritems()
+            items = dct.items()
         _encoding = self.encoding
         _do_decode = (_encoding is not None
             and not (_need_utf8 and _encoding == 'utf-8'))

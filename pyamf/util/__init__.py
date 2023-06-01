@@ -88,7 +88,7 @@ def set_attrs(obj, attrs):
     generic way possible.
 
     @param obj: An instance implementing C{__setattr__}, or C{__setitem__}
-    @param attrs: A collection implementing the C{iteritems} function
+    @param attrs: A collection implementing the C{items} function
     @type attrs: Usually a dict
     """
     o = setattr
@@ -96,14 +96,14 @@ def set_attrs(obj, attrs):
     if hasattr(obj, '__setitem__'):
         o = type(obj).__setitem__
 
-    [o(obj, k, v) for k, v in attrs.iteritems()]
+    [o(obj, k, v) for k, v in attrs.items()]
 
 
 def get_class_alias(klass):
     """
     Tries to find a suitable L{pyamf.ClassAlias} subclass for C{klass}.
     """
-    for k, v in pyamf.ALIAS_TYPES.iteritems():
+    for k, v in pyamf.ALIAS_TYPES.items():
         for kl in v:
             try:
                 if issubclass(klass, kl):

@@ -181,7 +181,7 @@ class Envelope(object):
     def __len__(self):
         return len(self.bodies)
 
-    def iteritems(self):
+    def items(self):
         for body in self.bodies:
             yield body
 
@@ -468,7 +468,7 @@ def _read_body(stream, decoder, strict=False, logger=None):
     status = STATUS_OK
     is_request = True
 
-    for code, s in STATUS_CODES.iteritems():
+    for code, s in STATUS_CODES.items():
         if not target.endswith(s):
             continue
 
@@ -593,7 +593,7 @@ def get_fault(data):
 
     e = {}
 
-    for x, y in data.iteritems():
+    for x, y in data.items():
         if isinstance(x, unicode):
             e[str(x)] = y
         else:
@@ -706,7 +706,7 @@ def encode(msg, strict=False, logger=None, timezone_offset=None, **kwargs):
     stream.write_ushort(msg.amfVersion)
     stream.write_ushort(len(msg.headers))
 
-    for name, header in msg.headers.iteritems():
+    for name, header in msg.headers.items():
         _write_header(
             name,
             header,
@@ -718,7 +718,7 @@ def encode(msg, strict=False, logger=None, timezone_offset=None, **kwargs):
 
     stream.write_short(len(msg))
 
-    for name, message in msg.iteritems():
+    for name, message in msg.items():
         encoder.context.clear()
 
         _write_body(name, message, stream, encoder, strict)

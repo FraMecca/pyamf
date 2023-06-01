@@ -509,7 +509,7 @@ class RemotingService(object):
         if remoting.REQUEST_PERSISTENT_HEADER in response.headers:
             data = response.headers[remoting.REQUEST_PERSISTENT_HEADER]
 
-            for k, v in data.iteritems():
+            for k, v in data.items():
                 self.headers[k] = v
 
         return response

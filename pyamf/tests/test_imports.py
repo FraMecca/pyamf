@@ -43,7 +43,7 @@ class ImportsTestCase(unittest.TestCase):
 
     def _clearModules(self, *args):
         for mod in args:
-            for k, v in sys.modules.copy().iteritems():
+            for k, v in sys.modules.copy().items():
                 if k.startswith(mod) or k == 'pyamf.tests.%s' % (mod,):
                     del sys.modules[k]
 

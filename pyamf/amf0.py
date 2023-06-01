@@ -243,7 +243,7 @@ class Decoder(codec.Decoder):
 
         attrs = self.readObjectAttributes(obj)
 
-        for key, value in attrs.iteritems():
+        for key, value in attrs.items():
             try:
                 key = int(key)
             except ValueError:
@@ -545,7 +545,7 @@ class Encoder(codec.Encoder):
 
         @param o: The C{dict} data to be encoded to the AMF0 data stream.
         """
-        for key, val in o.iteritems():
+        for key, val in o.items():
             if type(key) in python.int_types:
                 key = str(key)
 

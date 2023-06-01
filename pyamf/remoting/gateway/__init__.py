@@ -276,7 +276,7 @@ class BaseGateway(object):
         if services is None:
             services = {}
 
-        if not hasattr(services, 'iteritems'):
+        if not hasattr(services, 'items'):
             raise TypeError("dict type required for services")
 
         self.services = ServiceCollection()
@@ -292,7 +292,7 @@ class BaseGateway(object):
         if kwargs:
             raise TypeError('Unknown kwargs: %r' % (kwargs,))
 
-        for name, service in services.iteritems():
+        for name, service in services.items():
             self.addService(service, name)
 
     def addService(self, service, name=None, description=None,
@@ -364,7 +364,7 @@ class BaseGateway(object):
         @type service: C{callable} or a class instance
         @raise NameError: Service not found.
         """
-        for name, wrapper in self.services.iteritems():
+        for name, wrapper in self.services.items():
             if service in (name, wrapper.service):
                 del self.services[name]
                 return

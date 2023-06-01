@@ -123,7 +123,7 @@ class ClassAlias(object):
             self.decodable_properties.update(self.klass.__slots__)
             self.encodable_properties.update(self.klass.__slots__)
 
-        for k, v in self.klass.__dict__.iteritems():
+        for k, v in self.klass.__dict__.items():
             if not isinstance(v, property):
                 continue
 
@@ -439,14 +439,14 @@ class ClassAlias(object):
         if self.proxy_attrs is not None and attrs and codec:
             context = codec.context
 
-            for k, v in attrs.copy().iteritems():
+            for k, v in attrs.copy().items():
                 if k in self.proxy_attrs:
                     attrs[k] = context.getProxyForObject(v)
 
         if self.synonym_attrs:
             missing = object()
 
-            for k, v in self.synonym_attrs.iteritems():
+            for k, v in self.synonym_attrs.items():
                 value = attrs.pop(k, missing)
 
                 if value is missing:
@@ -528,7 +528,7 @@ class ClassAlias(object):
         if self.synonym_attrs:
             missing = object()
 
-            for k, v in self.synonym_attrs.iteritems():
+            for k, v in self.synonym_attrs.items():
                 value = attrs.pop(v, missing)
 
                 if value is missing:
