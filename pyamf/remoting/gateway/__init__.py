@@ -238,7 +238,7 @@ class ServiceCollection(dict):
     I hold a collection of services, mapping names to objects.
     """
     def __contains__(self, value):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             return value in self.keys()
 
         return value in self.values()
@@ -308,7 +308,7 @@ class BaseGateway(object):
         @raise TypeError: C{service} cannot be a scalar value.
         @raise TypeError: C{service} must be C{callable} or a module.
         """
-        if isinstance(service, (int, long, float, basestring)):
+        if isinstance(service, (int, long, float, str)):
             raise TypeError("Service cannot be a scalar value")
 
         allowed_types = (

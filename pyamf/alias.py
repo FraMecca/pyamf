@@ -318,7 +318,7 @@ class ClassAlias(object):
         )
 
     def __eq__(self, other):
-        if isinstance(other, basestring):
+        if isinstance(other, str):
             return self.alias == other
         elif isinstance(other, self.__class__):
             return self.klass == other.klass

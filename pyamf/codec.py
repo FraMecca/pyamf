@@ -290,7 +290,7 @@ class _Codec(object):
 
     def __init__(self, stream=None, context=None, strict=False,
                  timezone_offset=None, forbid_dtd=True, forbid_entities=True):
-        if isinstance(stream, basestring) or stream is None:
+        if isinstance(stream, str) or stream is None:
             stream = util.BufferedByteStream(stream)
 
         self.stream = stream

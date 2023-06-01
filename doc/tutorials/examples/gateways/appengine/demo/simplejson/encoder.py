@@ -45,7 +45,7 @@ def floatstr(o, allow_nan=True):
     return text
 
 
-def encode_basestring(s):
+def encode_str(s):
     """
     Return a JSON representation of a Python string
     """
@@ -53,7 +53,7 @@ def encode_basestring(s):
         return ESCAPE_DCT[match.group(0)]
     return '"' + ESCAPE.sub(replace, s) + '"'
 
-def encode_basestring_ascii(s):
+def encode_str_ascii(s):
     def replace(match):
         s = match.group(0)
         try:
@@ -71,7 +71,7 @@ def encode_basestring_ascii(s):
     return '"' + str(ESCAPE_ASCII.sub(replace, s)) + '"'
         
 try:
-    encode_basestring_ascii = _speedups.encode_basestring_ascii
+    encode_str_ascii = _speedups.encode_str_ascii
     _need_utf8 = True
 except AttributeError:
     _need_utf8 = False
@@ -224,9 +224,9 @@ class JSONEncoder(object):
             item_separator = self.item_separator
         first = True
         if self.ensure_ascii:
-            encoder = encode_basestring_ascii
+            encoder = encode_str_ascii
         else:
-            encoder = encode_basestring
+            encoder = encode_str
         allow_nan = self.allow_nan
         if self.sort_keys:
             keys = dct.keys()
@@ -241,7 +241,7 @@ class JSONEncoder(object):
             if isinstance(key, str):
                 if _do_decode:
                     key = key.decode(_encoding)
-            elif isinstance(key, basestring):
+            elif isinstance(key, str):
                 pass
             # JavaScript is weakly typed for these, so it makes sense to
             # also allow them.  Many encoders seem to do something like this.
@@ -275,11 +275,11 @@ class JSONEncoder(object):
             del markers[markerid]
 
     def _iterencode(self, o, markers=None):
-        if isinstance(o, basestring):
+        if isinstance(o, str):
             if self.ensure_ascii:
-                encoder = encode_basestring_ascii
+                encoder = encode_str_ascii
             else:
-                encoder = encode_basestring
+                encoder = encode_str
             _encoding = self.encoding
             if (_encoding is not None and isinstance(o, str)
                     and not (_need_utf8 and _encoding == 'utf-8')):
@@ -344,13 +344,13 @@ class JSONEncoder(object):
         '{"foo":["bar", "baz"]}'
         """
         # This is for extremely simple cases and benchmarks...
-        if isinstance(o, basestring):
+        if isinstance(o, str):
             if isinstance(o, str):
                 _encoding = self.encoding
                 if (_encoding is not None 
                         and not (_encoding == 'utf-8' and _need_utf8)):
                     o = o.decode(_encoding)
-            return encode_basestring_ascii(o)
+            return encode_str_ascii(o)
         # This doesn't pass the iterator directly to ''.join() because it
         # sucks at reporting exceptions.  It's going to do this internally
         # anyway because it uses PySequence_Fast or similar.

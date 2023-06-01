@@ -662,9 +662,9 @@ class Context(codec.Context):
         @rtype: C{int}
         @return: The reference index.
 
-        @raise TypeError: The parameter C{s} is not of C{basestring} type.
+        @raise TypeError: The parameter C{s} is not of C{str} type.
         """
-        if not isinstance(s, basestring):
+        if not isinstance(s, str):
             raise TypeError
 
         if len(s) == 0:

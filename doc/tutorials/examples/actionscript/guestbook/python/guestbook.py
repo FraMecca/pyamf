@@ -33,12 +33,12 @@ EMAIL_RE = r"^.+\@(\[?)[a-zA-Z0-9\-\.]+\.([a-zA-Z]{2,3}|[0-9]{1,3})(\]?)$"
 # This is MySQL specific, make sure that if you use a different database server
 # this is updated to ensure sql injection attacks don't occur 
 def sql_safe(value):
-    if isinstance(value, basestring):
+    if isinstance(value, str):
         return value.replace("'", "\\'")
     elif isinstance(type(value), (int, float)):
         return value
 
-    raise TypeError, 'basestring, int or float expected' 
+    raise TypeError, 'str, int or float expected' 
 
 
 def is_valid_url(url):
@@ -135,13 +135,13 @@ class GuestBookService(object):
         email = msg._amf_object.email
         message = msg._amf_object.message
  
-        if not isinstance(name, basestring):
+        if not isinstance(name, str):
             name = str(name)
 
         if len(name) > 50:
             raise IOError, "Name exceeds maximum length (50 chars max)"
 
-        if not isinstance(url, basestring):
+        if not isinstance(url, str):
             url = str(url)
 
         if len(url) > 255:
@@ -153,13 +153,13 @@ class GuestBookService(object):
             if not valid_url:
                 raise ValueError, "Website url not valid"
 
-        if not isinstance(email, basestring):
+        if not isinstance(email, str):
             email = str(email)
 
         if not is_valid_email(email):
             raise ValueError, "Email address is not valid"
 
-        if not isinstance(message, basestring):
+        if not isinstance(message, str):
             message = str(message)
 
         if len(message) == 0:

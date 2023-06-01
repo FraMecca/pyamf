@@ -144,7 +144,7 @@ def load(name_or_file):
     f = name_or_file
     opened = False
 
-    if isinstance(name_or_file, basestring):
+    if isinstance(name_or_file, str):
         f = open(name_or_file, 'rb')
         opened = True
     elif not hasattr(f, 'read'):
@@ -172,7 +172,7 @@ def save(sol, name_or_file, encoding=pyamf.AMF0):
     f = name_or_file
     opened = False
 
-    if isinstance(name_or_file, basestring):
+    if isinstance(name_or_file, str):
         f = open(name_or_file, 'wb+')
         opened = True
     elif not hasattr(f, 'write'):
