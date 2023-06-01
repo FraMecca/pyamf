@@ -261,7 +261,7 @@ class Decoder(codec.Decoder):
         self.context.addObject(obj)
         l = self.stream.read_ulong()
 
-        for i in xrange(l):
+        for i in range(l):
             obj.append(self.readElement())
 
         return obj

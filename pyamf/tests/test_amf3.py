@@ -1208,7 +1208,7 @@ class DataOutputTestCase(unittest.TestCase, EncoderMixIn):
         self.assertEqual(self.buf.getvalue(), '\x00')
 
     def test_byte(self):
-        for y in xrange(10):
+        for y in range(10):
             self.x.writeByte(y)
 
         self.assertEqual(
@@ -1381,7 +1381,7 @@ class DataInputTestCase(unittest.TestCase):
         self.buf.write('\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09')
         self.buf.seek(0)
 
-        for y in xrange(10):
+        for y in range(10):
             self.assertEqual(x.readByte(), y)
 
     def test_double(self):
@@ -1656,7 +1656,7 @@ class ExceptionEncodingTestCase(ClassCacheClearingTestCase, EncoderMixIn):
     def test_exception(self):
         try:
             raise Exception('foo bar')
-        except Exception, e:
+        except Exception as e:
             self.encoder.writeElement(e)
 
         self.assertEqual(
@@ -1671,7 +1671,7 @@ class ExceptionEncodingTestCase(ClassCacheClearingTestCase, EncoderMixIn):
 
         try:
             raise FooBar('foo bar')
-        except Exception, e:
+        except Exception as e:
             self.encoder.writeElement(e)
 
         self.assertEqual(
@@ -1688,7 +1688,7 @@ class ExceptionEncodingTestCase(ClassCacheClearingTestCase, EncoderMixIn):
 
         try:
             raise XYZ('blarg')
-        except Exception, e:
+        except Exception as e:
             self.encoder.writeElement(e)
 
         self.assertEqual(

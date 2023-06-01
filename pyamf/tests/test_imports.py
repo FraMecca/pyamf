@@ -95,7 +95,7 @@ class WhenImportedTestCase(ImportsTestCase):
 
         try:
             import spam  # noqa
-        except Exception, e:
+        except Exception:
             pass
         else:
             self.fail('expected exception')

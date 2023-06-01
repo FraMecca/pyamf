@@ -194,8 +194,7 @@ class EncoderTestCase(ClassCacheClearingTestCase, EncoderMixIn):
 
         self.assertEncoded(
             [['test', 'test', 'test', 'test']],
-            '\x0a\x00\x00\x00\x01\x0a\x00\x00\x00\x04' +
-            ('\x02\x00\x04test' * 4)
+            '\x0a\x00\x00\x00\x01\x0a\x00\x00\x00\x04' + ('\x02\x00\x04test' * 4)
         )
 
         x = {'a': 'spam', 'b': 'eggs'}
@@ -1169,7 +1168,7 @@ class ExceptionEncodingTestCase(ClassCacheClearingTestCase):
     def test_exception(self):
         try:
             raise Exception('foo bar')
-        except Exception, e:
+        except Exception as e:
             self.encoder.writeElement(e)
 
         self.assertEqual(
@@ -1184,7 +1183,7 @@ class ExceptionEncodingTestCase(ClassCacheClearingTestCase):
 
         try:
             raise FooBar('foo bar')
-        except Exception, e:
+        except Exception as e:
             self.encoder.writeElement(e)
 
         self.assertEqual(
@@ -1201,7 +1200,7 @@ class ExceptionEncodingTestCase(ClassCacheClearingTestCase):
 
         try:
             raise XYZ('blarg')
-        except Exception, e:
+        except Exception as e:
             self.encoder.writeElement(e)
 
         self.assertEqual(

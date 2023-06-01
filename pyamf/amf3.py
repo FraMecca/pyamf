@@ -938,7 +938,7 @@ class Decoder(codec.Decoder):
             result = []
             self.context.addObject(result)
 
-            for i in xrange(size):
+            for i in range(size):
                 result.append(self.readElement())
 
             return result
@@ -950,7 +950,7 @@ class Decoder(codec.Decoder):
             result[key] = self.readElement()
             key = self.readBytes()
 
-        for i in xrange(size):
+        for i in range(size):
             el = self.readElement()
             result[i] = el
 
@@ -989,7 +989,7 @@ class Decoder(codec.Decoder):
         class_def.static_properties = []
 
         if class_def.attr_len > 0:
-            for i in xrange(class_def.attr_len):
+            for i in range(class_def.attr_len):
                 key = self.readBytes()
 
                 class_def.static_properties.append(key)

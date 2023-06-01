@@ -611,7 +611,7 @@ def add_type(type_, func=None):
     if type_ in TYPE_MAP:
         raise KeyError('Type %r already exists' % (type_,))
 
-    if isinstance(type_, types.TupleType):
+    if isinstance(type_, tuple):
         for x in type_:
             _check_type(x)
     else:
