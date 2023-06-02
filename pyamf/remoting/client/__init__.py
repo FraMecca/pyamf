@@ -7,9 +7,9 @@ Remoting client implementation.
 @since: 0.1
 """
 
-import urllib.request
-import urllib.error
+from urllib.error import URLError
 from urllib.parse import urlparse
+from urllib.request import Request, urlopen
 
 import pyamf
 from pyamf import remoting
@@ -19,7 +19,10 @@ try:
 except ImportError:
     GzipFile = False
 
-from io import StringIO
+try:
+    from cStringIO import StringIO as BytesIO
+except ImportError:
+    from io import BytesIO
 
 
 #: Default user agent is `PyAMF/x.x(.x)`.
@@ -222,7 +225,7 @@ class RemotingService(object):
         self.referer = kwargs.pop('referer', None)
         self.strict = kwargs.pop('strict', False)
         self.logger = kwargs.pop('logger', None)
-        self.opener = kwargs.pop('opener', urllib.request.urlopen)
+        self.opener = kwargs.pop('opener', urlopen)
 
         if kwargs:
             raise TypeError('Unexpected keyword arguments %r' % (kwargs,))
@@ -396,7 +399,7 @@ class RemotingService(object):
             strict=self.strict
         )
 
-        http_request = urllib.request.Request(
+        http_request = Request(
             self._root_url, body.getvalue(),
             self._get_execute_headers()
         )
@@ -423,7 +426,7 @@ class RemotingService(object):
             strict=self.strict
         )
 
-        http_request = urllib.request.Request(
+        http_request = Request(
             self._root_url, body.getvalue(),
             self._get_execute_headers()
         )
@@ -444,7 +447,7 @@ class RemotingService(object):
 
         try:
             fbh = self.opener(http_request)
-        except urllib.error.URLError as e:
+        except URLError as e:
             if self.logger:
                 self.logger.exception('Failed request for %s', self._root_url)
 
@@ -452,10 +455,10 @@ class RemotingService(object):
 
         http_message = fbh.info()
 
-        content_encoding = http_message.getheader('Content-Encoding')
-        content_length = http_message.getheader('Content-Length') or -1
-        content_type = http_message.getheader('Content-Type')
-        server = http_message.getheader('Server')
+        content_encoding = http_message.get('Content-Encoding')
+        content_length = http_message.get('Content-Length') or -1
+        content_type = http_message.get('Content-Type')
+        server = http_message.get('Server')
 
         if self.logger:
             self.logger.debug('Content-Type: %r', content_type)
@@ -482,7 +485,7 @@ class RemotingService(object):
                     'Decompression of Content-Encoding: %s not available.' % (
                         content_encoding,))
 
-            compressedstream = StringIO(bytes)
+            compressedstream = BytesIO(bytes)
             gzipper = GzipFile(fileobj=compressedstream)
             bytes = gzipper.read()
             gzipper.close()
@@ -519,8 +522,8 @@ class RemotingService(object):
         self.addHeader(
             'Credentials',
             dict(
-                userid=username.decode('utf-8'),
-                password=password.decode('utf-8')
+                userid=username,
+                password=password
             ),
             True
         )

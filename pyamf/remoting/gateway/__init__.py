@@ -70,11 +70,11 @@ class ServiceWrapper(object):
         self.expose_request = expose_request
         self.preprocessor = preprocessor
 
-    def __cmp__(self, other):
+    def __eq__(self, other):
         if isinstance(other, ServiceWrapper):
-            return cmp(self.__dict__, other.__dict__)
+            return self.__dict__ == other.__dict__
 
-        return cmp(self.service, other)
+        return self.service == other
 
     def _get_service_func(self, method, params):
         """
@@ -85,7 +85,7 @@ class ServiceWrapper(object):
         """
         service = None
 
-        if isinstance(self.service, (type, types.ClassType)):
+        if isinstance(self.service, type):
             service = self.service()
         else:
             service = self.service
@@ -308,16 +308,15 @@ class BaseGateway(object):
         @raise TypeError: C{service} cannot be a scalar value.
         @raise TypeError: C{service} must be C{callable} or a module.
         """
-        if isinstance(service, (int, long, float, str)):
+        if isinstance(service, (int, float, str)):
             raise TypeError("Service cannot be a scalar value")
 
         allowed_types = (
             types.ModuleType,
             types.FunctionType,
-            types.DictType,
+            dict,
             types.MethodType,
-            types.InstanceType,
-            types.ObjectType,
+            object,
         )
 
         if not python.callable(service) and \
@@ -326,10 +325,10 @@ class BaseGateway(object):
 
         if name is None:
             # TODO: include the module in the name
-            if isinstance(service, (type, types.ClassType)):
+            if isinstance(service, (type, type)):
                 name = service.__name__
             elif isinstance(service, types.FunctionType):
-                name = service.func_name
+                name = service.__name__
             elif isinstance(service, types.ModuleType):
                 name = service.__name__
             else:
@@ -546,7 +545,7 @@ def authenticate(func, c, expose_request=False):
 
     attr = func
 
-    if isinstance(func, types.UnboundMethodType):
+    if isinstance(func, types.MethodType):
         attr = func.im_func
 
     if expose_request is True:
@@ -566,7 +565,7 @@ def expose_request(func):
     if not python.callable(func):
         raise TypeError("func must be callable")
 
-    if isinstance(func, types.UnboundMethodType):
+    if isinstance(func, types.MethodType):
         setattr(func.im_func, '_pyamf_expose_request', True)
     else:
         setattr(func, '_pyamf_expose_request', True)
@@ -592,7 +591,7 @@ def preprocess(func, c, expose_request=False):
 
     attr = func
 
-    if isinstance(func, types.UnboundMethodType):
+    if isinstance(func, types.MethodType):
         attr = func.im_func
 
     if expose_request is True:
