@@ -229,7 +229,7 @@ class Context(object):
         try:
             alias = self._class_aliases[klass] = pyamf.get_class_alias(klass)
         except pyamf.UnknownClassAlias:
-            if isinstance(klass, python.str_types):
+            if isinstance(klass, bytes):
                 raise
 
             # no alias has been found yet .. check subclasses

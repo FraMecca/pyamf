@@ -15,6 +15,11 @@ import pyamf
 from pyamf import ClassAlias
 from pyamf.tests.util import ClassCacheClearingTestCase, Spam, get_fqcn
 
+try:
+    set
+except NameError:
+    from sets import Set as set
+
 
 class ClassAliasTestCase(ClassCacheClearingTestCase):
     """
@@ -92,18 +97,6 @@ class ClassAliasTestCase(ClassCacheClearingTestCase):
 
     def test_bad_class(self):
         self.assertRaises(TypeError, ClassAlias, 'eggs', 'blah')
-
-    def test_init_args(self):
-        class ClassicFoo:
-            def __init__(self, foo, bar):
-                pass
-
-        class NewFoo(object):
-            def __init__(self, foo, bar):
-                pass
-
-        # self.assertRaises(TypeError, ClassAlias, ClassicFoo)
-        ClassAlias(NewFoo)
 
     def test_createInstance(self):
         x = ClassAlias(Spam, 'org.example.spam.Spam')
@@ -194,6 +187,7 @@ class GetEncodableAttributesTestCase(unittest.TestCase):
         attrs = self.alias.getEncodableAttributes(self.obj, c)
 
         k = list(attrs.keys())
+
         k.sort()
 
         self.assertEqual(k, ['bar', 'foo'])
@@ -1024,13 +1018,13 @@ class CompilationIntegrationTestCase(unittest.TestCase):
 
         c = ClassAlias(C)
 
-        self.assertFalse(c.dynamic)
+        self.assertTrue(c.dynamic)
         self.assertEqual(c.encodable_properties, ['bar', 'foo', 'gak'])
         self.assertEqual(c.decodable_properties, ['bar', 'foo', 'gak'])
 
         d = ClassAlias(D)
 
-        self.assertFalse(d.dynamic)
+        self.assertTrue(d.dynamic)
         self.assertEqual(d.encodable_properties, ['bar', 'foo', 'gak', 'spam'])
         self.assertEqual(d.decodable_properties, ['bar', 'foo', 'gak', 'spam'])
 

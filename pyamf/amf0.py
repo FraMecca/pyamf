@@ -485,7 +485,7 @@ class Encoder(codec.Encoder):
         """
         Similar to L{writeString} but does not encode a type byte.
         """
-        if type(s) is unicode:
+        if type(s) is str:
             s = self.context.getBytesForString(s)
 
         l = len(s)
@@ -570,7 +570,7 @@ class Encoder(codec.Encoder):
             # list comprehensions to save the day
             max_index = max([
                 y[0] for y in o.items()
-                if isinstance(y[0], (int, long))
+                if isinstance(y[0], int)
             ])
 
             if max_index < 0:
@@ -659,7 +659,7 @@ class Encoder(codec.Encoder):
 
         data = xml.tostring(e)
 
-        if isinstance(data, unicode):
+        if isinstance(data, str):
             data = data.encode('utf-8')
 
         self.stream.write_ulong(len(data))

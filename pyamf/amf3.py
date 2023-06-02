@@ -249,7 +249,7 @@ class DataOutput(object):
         @see: U{Supported character sets on Adobe Help (external)
             <http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/charset-codes.html>}
         """
-        if type(value) is unicode:
+        if type(value) is str:
             value = value.encode(charset)
 
         self.stream.write(value)
@@ -664,8 +664,8 @@ class Context(codec.Context):
 
         @raise TypeError: The parameter C{s} is not of C{str} type.
         """
-        if not isinstance(s, str):
-            raise TypeError
+        if not isinstance(s, bytes):
+            raise TypeError(f'Got:{s}, {type(s)}')
 
         if len(s) == 0:
             return -1
@@ -1244,7 +1244,7 @@ class Encoder(codec.Encoder):
         @type   s: C{str}
         @param  s: The string data to be encoded to the AMF3 data stream.
         """
-        if type(s) is unicode:
+        if type(s) is str:
             s = self.context.getBytesForString(s)
 
         self.serialiseBytes(s)
@@ -1370,7 +1370,7 @@ class Encoder(codec.Encoder):
         for x in keys:
             if isinstance(x, python.int_types):
                 int_keys.append(x)
-            elif isinstance(x, python.str_types):
+            elif isinstance(x, bytes):
                 str_keys.append(x)
             else:
                 raise ValueError("Non int/str key value found in dict")
@@ -1548,7 +1548,7 @@ class Encoder(codec.Encoder):
 
         self.context.addObject(n)
 
-        self.serialiseString(xml.tostring(n).encode('utf-8'))
+        self.serialiseString(xml.tostring(n).decode('utf-8'))
 
 
 def encode_int(n):

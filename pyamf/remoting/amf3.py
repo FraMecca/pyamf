@@ -79,7 +79,7 @@ def generate_error(request, cls, e, tb, include_traceback=False):
     if hasattr(e, 'message'):
         faultString = unicode(e.message)
     elif hasattr(e, 'args') and e.args:
-        if isinstance(e.args[0], pyamf.python.str_types):
+        if isinstance(e.args[0], pyamf.bytes):
             faultString = unicode(e.args[0])
 
     if details:

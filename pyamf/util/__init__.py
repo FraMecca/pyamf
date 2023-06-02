@@ -14,7 +14,10 @@ import inspect
 import pyamf
 from pyamf import python
 
-from pyamf.util.pure import BufferedByteStream
+try:
+    from cpyamf.util import BufferedByteStream
+except ImportError:
+    from pyamf.util.pure import BufferedByteStream
 
 
 __all__ = [
@@ -88,7 +91,7 @@ def set_attrs(obj, attrs):
     generic way possible.
 
     @param obj: An instance implementing C{__setattr__}, or C{__setitem__}
-    @param attrs: A collection implementing the C{items} function
+    @param attrs: A collection implementing the C{iteritems} function
     @type attrs: Usually a dict
     """
     o = setattr
@@ -103,7 +106,7 @@ def get_class_alias(klass):
     """
     Tries to find a suitable L{pyamf.ClassAlias} subclass for C{klass}.
     """
-    for k, v in pyamf.ALIAS_TYPES.items():
+    for k, v in list(pyamf.ALIAS_TYPES.items()):
         for kl in v:
             try:
                 if issubclass(klass, kl):
@@ -195,6 +198,9 @@ def get_module(mod_name):
     """
     Load and return a module based on C{mod_name}.
     """
+    if isinstance(mod_name, bytes):
+        mod_name = mod_name.decode()
+
     if mod_name == '':
         raise ImportError('Unable to import empty module')
 
@@ -209,5 +215,5 @@ def get_module(mod_name):
 
 try:
     datetime.datetime.utcfromtimestamp(-31536000.0)
-except ValueError:
+except (ValueError, OSError):
     negative_timestamp_broken = True

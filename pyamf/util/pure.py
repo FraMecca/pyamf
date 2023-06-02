@@ -12,11 +12,7 @@ Do not reference directly, use L{pyamf.util.BufferedByteStream} instead.
 """
 
 import struct
-
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from io import StringIO
+from io import BytesIO
 
 from pyamf import python
 
@@ -24,9 +20,9 @@ from pyamf import python
 SYSTEM_ENDIAN = None
 
 
-class StringIOProxy(object):
+class BytesIOProxy(object):
     """
-    I am a C{StringIO} type object containing byte data from the AMF stream.
+    I am a C{BytesIO} type object containing byte data from the AMF stream.
 
     @see: U{ByteArray on OSFlash
         <http://osflash.org/documentation/amf3#x0c_-_bytearray>}
@@ -36,11 +32,13 @@ class StringIOProxy(object):
 
     def __init__(self, buf=None):
         """
-        @raise TypeError: Unable to coerce C{buf} to C{StringIO}.
+        @raise TypeError: Unable to coerce C{buf} to C{BytesIO}.
         """
-        self._buffer = StringIO()
+        self._buffer = BytesIO()
 
-        if isinstance(buf, python.str_types):
+        if isinstance(buf, str):
+            self._buffer.write(buf.encode())
+        elif isinstance(buf, bytes):
             self._buffer.write(buf)
         elif hasattr(buf, 'getvalue'):
             self._buffer.write(buf.getvalue())
@@ -53,7 +51,7 @@ class StringIOProxy(object):
             self._buffer.write(buf.read())
             buf.seek(old_pos)
         elif buf is not None:
-            raise TypeError("Unable to coerce buf->StringIO got %r" % (buf,))
+            raise TypeError("Unable to coerce buf->BytesIO got %r" % (buf,))
 
         self._get_len()
         self._len_changed = False
@@ -73,7 +71,6 @@ class StringIOProxy(object):
             raise IOError('Cannot read backwards')
 
         bytes = self._buffer.read(n)
-
         return bytes
 
     def seek(self, pos, mode=0):
@@ -102,7 +99,7 @@ class StringIOProxy(object):
         @type size: C{int}
         """
         if size == 0:
-            self._buffer = StringIO()
+            self._buffer = BytesIO()
             self._len_changed = True
 
             return
@@ -110,7 +107,7 @@ class StringIOProxy(object):
         cur_pos = self.tell()
         self.seek(0)
         buf = self.read(size)
-        self._buffer = StringIO()
+        self._buffer = BytesIO()
 
         self._buffer.write(buf)
         self.seek(cur_pos)
@@ -191,6 +188,14 @@ class DataTypeMixIn(object):
     ENDIAN_BIG = ">"
 
     endian = ENDIAN_NETWORK
+
+    @property
+    def endian(self):
+        return self.__endian
+
+    @endian.setter
+    def endian(self, value):
+        self.__endian = value.decode() if isinstance(value, bytes) else value
 
     def _read(self, length):
         """
@@ -503,20 +508,20 @@ class DataTypeMixIn(object):
         @param u: unicode object
         @raise TypeError: Unexpected type for str C{u}.
         """
-        if not isinstance(u, python.str_types):
-            raise TypeError('Expected %r, got %r' % (python.str_types, u))
+        if not isinstance(u, bytes):
+            raise TypeError('Expected %r, got %r' % (bytes, u))
 
         bytes = u
 
-        if isinstance(bytes, unicode):
+        if isinstance(bytes, str):
             bytes = u.encode("utf8")
 
         self.write(struct.pack("%s%ds" % (self.endian, len(bytes)), bytes))
 
 
-class BufferedByteStream(StringIOProxy, DataTypeMixIn):
+class BufferedByteStream(BytesIOProxy, DataTypeMixIn):
     """
-    An extension of C{StringIO}.
+    An extension of C{BytesIO}.
 
     Features:
      - Raises L{IOError} if reading past end.
@@ -526,10 +531,10 @@ class BufferedByteStream(StringIOProxy, DataTypeMixIn):
     def __init__(self, buf=None, min_buf_size=None):
         """
         @param buf: Initial byte stream.
-        @type buf: C{str} or C{StringIO} instance
+        @type buf: C{str} or C{BytesIO} instance
         @param min_buf_size: Ignored in the pure Python version.
         """
-        StringIOProxy.__init__(self, buf=buf)
+        BytesIOProxy.__init__(self, buf=buf)
 
     def read(self, length=-1):
         """
@@ -547,7 +552,7 @@ class BufferedByteStream(StringIOProxy, DataTypeMixIn):
                 'remain' % (length, len(self) - self.tell())
             )
 
-        return StringIOProxy.read(self, length)
+        return BytesIOProxy.read(self, length)
 
     def peek(self, size=1):
         """

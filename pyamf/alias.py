@@ -123,7 +123,7 @@ class ClassAlias(object):
             self.decodable_properties.update(self.klass.__slots__)
             self.encodable_properties.update(self.klass.__slots__)
 
-        for k, v in self.klass.__dict__.items():
+        for k, v in list(self.klass.__dict__.items()):
             if not isinstance(v, property):
                 continue
 
@@ -474,7 +474,7 @@ class ClassAlias(object):
 
         changed = False
 
-        props = set(attrs.keys())
+        props = set(key.decode() if isinstance(key, bytes) else key for key in attrs.keys())
 
         if self.static_attrs:
             missing_attrs = self.static_attrs_set.difference(props)
@@ -551,6 +551,12 @@ class ClassAlias(object):
         """
         if not self._compiled:
             self.compile()
+
+        old_attrs = attrs
+        attrs = dict()
+        for key, value in old_attrs.items():
+            key = key.decode() if isinstance(key, bytes) else key
+            attrs[key] = value
 
         if not self.shortcut_decode:
             attrs = self.getDecodableAttributes(obj, attrs, codec=codec)

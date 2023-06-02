@@ -19,15 +19,9 @@ func_types = (
 )
 class_types = [type]
 int_types = [int]
-str_types = [str]
 
 try:
     int_types.append(long)
-except NameError:
-    pass
-
-try:
-    str_types.append(unicode)
 except NameError:
     pass
 
@@ -38,7 +32,6 @@ except:
 
 
 int_types = tuple(int_types)
-str_types = tuple(str_types)
 class_types = tuple(class_types)
 
 PosInf = 1e300000

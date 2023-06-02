@@ -300,7 +300,7 @@ def get_class_alias(klass_or_alias):
 
     @raise UnknownClassAlias: Unknown alias
     """
-    if isinstance(klass_or_alias, python.str_types):
+    if isinstance(klass_or_alias, bytes):
         try:
             return CLASS_CACHE[klass_or_alias]
         except KeyError:
@@ -681,7 +681,7 @@ def add_error_class(klass, code):
         class.
     @raise ValueError: C{code} is already registered to an error class.
     """
-    if not isinstance(code, python.str_types):
+    if not isinstance(code, bytes):
         code = code.decode('utf-8')
 
     if not isinstance(klass, python.class_types):
@@ -716,7 +716,7 @@ def remove_error_class(klass):
     @raise ValueError: Cannot find registered class.
     @raise TypeError: C{klass} is invalid type.
     """
-    if isinstance(klass, python.str_types):
+    if isinstance(klass, bytes):
         if klass not in ERROR_CLASS_MAP:
             raise ValueError('Code %s is not registered' % (klass,))
     elif isinstance(klass, python.class_types):
@@ -838,7 +838,7 @@ def register_package(module=None, package=None, separator='.', ignore=None,
     """
     ignore = ignore or []
 
-    if isinstance(module, python.str_types):
+    if isinstance(module, bytes):
         if module == '':
             raise TypeError('Cannot get list of classes from %r' % (module,))
 
