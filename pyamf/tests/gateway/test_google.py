@@ -11,7 +11,7 @@ Google Web App gateway tests.
 
 import unittest
 
-from io import StringIO
+from io import BytesIO as StringIO
 
 try:
     from google.appengine.ext import webapp

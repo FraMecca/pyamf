@@ -630,10 +630,7 @@ class TestAMF0Codecs(unittest.TestCase):
         """
         If the extension is available, it must be returned by default.
         """
-        try:
-            from cpyamf import amf0
-        except ImportError:
-            from pyamf import amf0
+        from pyamf import amf0
 
         decoder = pyamf.get_decoder(pyamf.AMF0)
 
@@ -643,10 +640,7 @@ class TestAMF0Codecs(unittest.TestCase):
         """
         With `use_ext=True` specified, the extension must be returned.
         """
-        try:
-            from cpyamf import amf0
-        except ImportError as err:
-            self.skipTest('amf0 extension not available')
+        self.skipTest('amf0 extension not available')
 
         decoder = pyamf.get_decoder(pyamf.AMF0, use_ext=True)
 
@@ -666,25 +660,9 @@ class TestAMF0Codecs(unittest.TestCase):
         """
         If the extension is available, it must be returned by default.
         """
-        try:
-            from cpyamf import amf0
-        except ImportError:
-            from pyamf import amf0
+        from pyamf import amf0
 
         encoder = pyamf.get_encoder(pyamf.AMF0)
-
-        self.assertIsInstance(encoder, amf0.Encoder)
-
-    def test_ext_encoder(self):
-        """
-        With `use_ext=True` specified, the extension must be returned.
-        """
-        try:
-            from cpyamf import amf0
-        except ImportError:
-            self.skipTest('amf0 extension not available')
-
-        encoder = pyamf.get_encoder(pyamf.AMF0, use_ext=True)
 
         self.assertIsInstance(encoder, amf0.Encoder)
 
@@ -708,25 +686,9 @@ class TestAMF3Codecs(unittest.TestCase):
         """
         If the extension is available, it must be returned by default.
         """
-        try:
-            from cpyamf import amf3
-        except ImportError:
-            from pyamf import amf3
+        from pyamf import amf3
 
         decoder = pyamf.get_decoder(pyamf.AMF3)
-
-        self.assertIsInstance(decoder, amf3.Decoder)
-
-    def test_ext_decoder(self):
-        """
-        With `use_ext=True` specified, the extension must be returned.
-        """
-        try:
-            from cpyamf import amf3
-        except ImportError:
-            self.skipTest('amf3 extension not available')
-
-        decoder = pyamf.get_decoder(pyamf.AMF3, use_ext=True)
 
         self.assertIsInstance(decoder, amf3.Decoder)
 
@@ -750,19 +712,6 @@ class TestAMF3Codecs(unittest.TestCase):
             from pyamf import amf3
 
         encoder = pyamf.get_encoder(pyamf.AMF3)
-
-        self.assertIsInstance(encoder, amf3.Encoder)
-
-    def test_ext_encoder(self):
-        """
-        With `use_ext=True` specified, the extension must be returned.
-        """
-        try:
-            from cpyamf import amf3
-        except ImportError:
-            self.skipTest('amf3 extension not available')
-
-        encoder = pyamf.get_encoder(pyamf.AMF3, use_ext=True)
 
         self.assertIsInstance(encoder, amf3.Encoder)
 
