@@ -44,37 +44,37 @@ use_proxies_default = False
 
 #: The undefined type is represented by the undefined type marker. No further
 #: information is encoded for this value.
-TYPE_UNDEFINED = '\x00'
+TYPE_UNDEFINED = b'\x00'
 #: The null type is represented by the null type marker. No further
 #: information is encoded for this value.
-TYPE_NULL = '\x01'
+TYPE_NULL = b'\x01'
 #: The false type is represented by the false type marker and is used to
 #: encode a Boolean value of C{false}. No further information is encoded for
 #: this value.
-TYPE_BOOL_FALSE = '\x02'
+TYPE_BOOL_FALSE = b'\x02'
 #: The true type is represented by the true type marker and is used to encode
 #: a Boolean value of C{true}. No further information is encoded for this
 #: value.
-TYPE_BOOL_TRUE = '\x03'
+TYPE_BOOL_TRUE = b'\x03'
 #: In AMF 3 integers are serialized using a variable length signed 29-bit
 #: integer.
 #: @see: U{Parsing Integers on OSFlash (external)
 #: <http://osflash.org/amf3/parsing_integers>}
-TYPE_INTEGER = '\x04'
+TYPE_INTEGER = b'\x04'
 #: This type is used to encode an ActionScript Number or an ActionScript
 #: C{int} of value greater than or equal to 2^28 or an ActionScript uint of
 #: value greater than or equal to 2^29. The encoded value is is always an 8
 #: byte IEEE-754 double precision floating point value in network byte order
 #: (sign bit in low memory). The AMF 3 number type is encoded in the same
 #: manner as the AMF 0 L{Number<pyamf.amf0.TYPE_NUMBER>} type.
-TYPE_NUMBER = '\x05'
+TYPE_NUMBER = b'\x05'
 #: ActionScript String values are represented using a single string type in
 #: AMF 3 - the concept of string and long string types from AMF 0 is not used.
 #: Strings can be sent as a reference to a previously occurring String by
 #: using an index to the implicit string reference table. Strings are encoding
 #: using UTF-8 - however the header may either describe a string literal or a
 #: string reference.
-TYPE_STRING = '\x06'
+TYPE_STRING = b'\x06'
 #: ActionScript 3.0 introduced a new XML type however the legacy C{XMLDocument}
 #: type from ActionScript 1.0 and 2.0.is retained in the language as
 #: C{flash.xml.XMLDocument}. Similar to AMF 0, the structure of an
@@ -86,29 +86,29 @@ TYPE_STRING = '\x06'
 #: @see: U{OSFlash documentation (external)
 #: <http://osflash.org/documentation/amf3
 #:     #x07_-_xml_legacy_flash.xml.xmldocument_class>}
-TYPE_XML = '\x07'
+TYPE_XML = b'\x07'
 #: In AMF 3 an ActionScript Date is serialized as the number of
 #: milliseconds elapsed since the epoch of midnight, 1st Jan 1970 in the
 #: UTC time zone. Local time zone information is not sent.
-TYPE_DATE = '\x08'
+TYPE_DATE = b'\x08'
 #: ActionScript Arrays are described based on the nature of their indices,
 #: i.e. their type and how they are positioned in the Array.
-TYPE_ARRAY = '\x09'
+TYPE_ARRAY = b'\x09'
 #: A single AMF 3 type handles ActionScript Objects and custom user classes.
-TYPE_OBJECT = '\x0A'
+TYPE_OBJECT = b'\x0A'
 #: ActionScript 3.0 introduces a new top-level XML class that supports
 #: U{E4X<http://en.wikipedia.org/wiki/E4X>} syntax.
 #: For serialization purposes the XML type needs to be flattened into a
 #: string representation. As with other strings in AMF, the content is
 #: encoded using UTF-8.
-TYPE_XMLSTRING = '\x0B'
+TYPE_XMLSTRING = b'\x0B'
 #: ActionScript 3.0 introduces the L{ByteArray} type to hold an Array
 #: of bytes. AMF 3 serializes this type using a variable length encoding
 #: 29-bit integer for the byte-length prefix followed by the raw bytes
 #: of the L{ByteArray}.
 #: @see: U{Parsing ByteArrays on OSFlash (external)
 #: <http://osflash.org/documentation/amf3/parsing_byte_arrays>}
-TYPE_BYTEARRAY = '\x0C'
+TYPE_BYTEARRAY = b'\x0C'
 
 #: Reference bit.
 REFERENCE_BIT = 0x01
@@ -318,10 +318,10 @@ class DataOutput(object):
         """
         val = None
 
-        if isinstance(value, unicode):
+        if isinstance(value, str):
             val = value
         else:
-            val = unicode(value, 'utf8')
+            val = str(value, 'utf8')
 
         self.stream.write_utf8_string(val)
 
@@ -356,9 +356,9 @@ class DataInput(object):
         """
         byte = self.stream.read(1)
 
-        if byte == '\x00':
+        if byte == b'\x00':
             return False
-        elif byte == '\x01':
+        elif byte == b'\x01':
             return True
         else:
             raise ValueError("Error reading boolean")
@@ -417,7 +417,7 @@ class DataInput(object):
         # FIXME nick: how to work out the code point byte size (on the fly)?
         bytes = self.stream.read(length)
 
-        return unicode(bytes, charset)
+        return str(bytes, charset)
 
     def readObject(self):
         """
@@ -508,7 +508,7 @@ class ByteArray(util.BufferedByteStream, DataInput, DataOutput):
     <http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/utils/ByteArray.html>}
     """
 
-    _zlib_header = '\x78\x9c'
+    _zlib_header = b'\x78\x9c'
 
     class __amf__:
         amf3 = True
@@ -532,11 +532,11 @@ class ByteArray(util.BufferedByteStream, DataInput, DataOutput):
 
         return super(ByteArray, self).writeObject(obj)
 
-    def __cmp__(self, other):
+    def __eq__(self, other):
         if isinstance(other, ByteArray):
-            return cmp(self.getvalue(), other.getvalue())
+            return self.getvalue() == other.getvalue()
 
-        return cmp(self.getvalue(), other)
+        return self.getvalue() == other
 
     def __str__(self):
         buf = self.getvalue()
@@ -546,7 +546,17 @@ class ByteArray(util.BufferedByteStream, DataInput, DataOutput):
 
         buf = zlib.compress(buf)
         # FIXME nick: hacked
-        return buf[0] + '\xda' + buf[2:]
+        return buf[:1] + b'\xda' + buf[2:]
+
+    def __bytes__(self):
+        buf = self.getvalue()
+
+        if not self.compressed:
+            return buf
+
+        buf = zlib.compress(buf)
+        # FIXME nick: hacked
+        return buf[:1] + b'\xda' + buf[2:]
 
     def compress(self):
         """
@@ -662,10 +672,12 @@ class Context(codec.Context):
         @rtype: C{int}
         @return: The reference index.
 
-        @raise TypeError: The parameter C{s} is not of C{str} type.
+        @raise TypeError: The parameter C{s} is not of C{basestring} type.
         """
-        if not isinstance(s, bytes):
-            raise TypeError(f'Got:{s}, {type(s)}')
+        if isinstance(s, str):
+            s = s.encode()
+        elif not isinstance(s, bytes):
+            raise TypeError
 
         if len(s) == 0:
             return -1
@@ -947,6 +959,8 @@ class Decoder(codec.Decoder):
         self.context.addObject(result)
 
         while key:
+            if isinstance(key, bytes):
+                key = key.decode()
             result[key] = self.readElement()
             key = self.readBytes()
 
@@ -990,7 +1004,7 @@ class Decoder(codec.Decoder):
 
         if class_def.attr_len > 0:
             for i in range(class_def.attr_len):
-                key = self.readBytes()
+                key = self.readString()
 
                 class_def.static_properties.append(key)
 
@@ -1328,7 +1342,7 @@ class Encoder(codec.Encoder):
         self.context.addObject(n)
 
         self._writeInteger((len(n) << 1) | REFERENCE_BIT)
-        self.stream.write('\x01')
+        self.stream.write(b'\x01')
 
         [self.writeElement(x) for x in n]
 
@@ -1370,7 +1384,7 @@ class Encoder(codec.Encoder):
         for x in keys:
             if isinstance(x, python.int_types):
                 int_keys.append(x)
-            elif isinstance(x, bytes):
+            elif isinstance(x, python.str_types):
                 str_keys.append(x)
             else:
                 raise ValueError("Non int/str key value found in dict")
@@ -1469,7 +1483,7 @@ class Encoder(codec.Encoder):
                 definition.reference << 2 | REFERENCE_BIT)
 
             if alias.anonymous:
-                self.stream.write('\x01')
+                self.stream.write(b'\x01')
             else:
                 self.serialiseString(alias.alias)
 
@@ -1506,7 +1520,7 @@ class Encoder(codec.Encoder):
                     self.serialiseString(attr)
                     self.writeElement(value)
 
-            self.stream.write('\x01')
+            self.stream.write(b'\x01')
 
     def writeByteArray(self, n):
         """
@@ -1526,7 +1540,7 @@ class Encoder(codec.Encoder):
 
         self.context.addObject(n)
 
-        buf = str(n)
+        buf = bytes(n)
         l = len(buf)
         self._writeInteger(l << 1 | REFERENCE_BIT)
         self.stream.write(buf)
@@ -1548,7 +1562,7 @@ class Encoder(codec.Encoder):
 
         self.context.addObject(n)
 
-        self.serialiseString(xml.tostring(n).decode('utf-8'))
+        self.serialiseString(xml.tostring(n))
 
 
 def encode_int(n):
@@ -1574,31 +1588,31 @@ def encode_int(n):
     if n < 0:
         n += 0x20000000
 
-    bytes = ''
+    data = b''
     real_value = None
 
     if n > 0x1fffff:
         real_value = n
         n >>= 1
-        bytes += chr(0x80 | ((n >> 21) & 0xff))
+        data += bytes([0x80 | ((n >> 21) & 0xff)])
 
     if n > 0x3fff:
-        bytes += chr(0x80 | ((n >> 14) & 0xff))
+        data += bytes([0x80 | ((n >> 14) & 0xff)])
 
     if n > 0x7f:
-        bytes += chr(0x80 | ((n >> 7) & 0xff))
+        data += bytes([0x80 | ((n >> 7) & 0xff)])
 
     if real_value is not None:
         n = real_value
 
     if n > 0x1fffff:
-        bytes += chr(n & 0xff)
+        data += bytes([n & 0xff])
     else:
-        bytes += chr(n & 0x7f)
+        data += bytes([n & 0x7f])
 
-    ENCODED_INT_CACHE[n] = bytes
+    ENCODED_INT_CACHE[n] = data
 
-    return bytes
+    return data
 
 
 def decode_int(stream, signed=False):
