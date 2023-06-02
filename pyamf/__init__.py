@@ -238,7 +238,7 @@ class ErrorAlias(ClassAlias):
     def getEncodableAttributes(self, obj, **kwargs):
         attrs = ClassAlias.getEncodableAttributes(self, obj, **kwargs)
 
-        attrs['message'] = unicode(obj)
+        attrs['message'] = str(obj)
         attrs['name'] = obj.__class__.__name__
 
         return attrs
@@ -300,7 +300,7 @@ def get_class_alias(klass_or_alias):
 
     @raise UnknownClassAlias: Unknown alias
     """
-    if isinstance(klass_or_alias, bytes):
+    if isinstance(klass_or_alias, python.str_types):
         try:
             return CLASS_CACHE[klass_or_alias]
         except KeyError:
@@ -376,6 +376,9 @@ def load_class(alias):
     @return: Class registered to the alias.
     @rtype: C{classobj}
     """
+    if isinstance(alias, bytes):
+        alias = alias.decode()
+
     # Try the CLASS_CACHE first
     try:
         return CLASS_CACHE[alias]
@@ -681,7 +684,7 @@ def add_error_class(klass, code):
         class.
     @raise ValueError: C{code} is already registered to an error class.
     """
-    if not isinstance(code, bytes):
+    if not isinstance(code, python.str_types):
         code = code.decode('utf-8')
 
     if not isinstance(klass, python.class_types):
@@ -716,7 +719,7 @@ def remove_error_class(klass):
     @raise ValueError: Cannot find registered class.
     @raise TypeError: C{klass} is invalid type.
     """
-    if isinstance(klass, bytes):
+    if isinstance(klass, python.str_types):
         if klass not in ERROR_CLASS_MAP:
             raise ValueError('Code %s is not registered' % (klass,))
     elif isinstance(klass, python.class_types):
@@ -724,7 +727,7 @@ def remove_error_class(klass):
         if klass not in classes:
             raise ValueError('Class %s is not registered' % (klass,))
 
-        klass = ERROR_CLASS_MAP.keys()[classes.index(klass)]
+        klass = list(ERROR_CLASS_MAP.keys())[list(classes).index(klass)]
     else:
         raise TypeError("Invalid type, expected class or string")
 
@@ -756,7 +759,7 @@ def register_alias_type(klass, *args):
      - At least one type must be supplied
     """
     def check_type_registered(arg):
-        for k, v in ALIAS_TYPES.items():
+        for k, v in list(ALIAS_TYPES.items()):
             for kl in v:
                 if arg is kl:
                     raise RuntimeError('%r is already registered under %r' % (
@@ -784,7 +787,7 @@ def register_alias_type(klass, *args):
 
     ALIAS_TYPES[klass] = args
 
-    for k, v in CLASS_CACHE.copy().items():
+    for k, v in list(CLASS_CACHE.copy().items()):
         new_alias = util.get_class_alias(v.klass)
 
         if new_alias is klass:
@@ -838,7 +841,7 @@ def register_package(module=None, package=None, separator='.', ignore=None,
     """
     ignore = ignore or []
 
-    if isinstance(module, bytes):
+    if isinstance(module, python.str_types):
         if module == '':
             raise TypeError('Cannot get list of classes from %r' % (module,))
 

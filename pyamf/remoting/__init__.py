@@ -176,16 +176,12 @@ class Envelope(object):
         for body in self.bodies:
             yield body[0], body[1]
 
-        raise StopIteration
-
     def __len__(self):
         return len(self.bodies)
 
-    def items(self):
+    def iteritems(self):
         for body in self.bodies:
             yield body
-
-        raise StopIteration
 
     def keys(self):
         return [body[0] for body in self.bodies]
@@ -353,7 +349,7 @@ class BaseFault(object):
         Raises an exception based on the fault object. There is no traceback
         available.
         """
-        raise get_exception_from_fault(self)
+        raise get_exception_from_fault(self)(self.description, None)
 
 
 class ErrorFault(BaseFault):
@@ -447,14 +443,14 @@ def _read_body(stream, decoder, strict=False, logger=None):
         # does not keep the array of args in the object references lookup
         type_byte = stream.peek(1)
 
-        if type_byte == '\x11':
+        if type_byte == b'\x11':
             if not decoder.use_amf3:
                 raise pyamf.DecodeError(
                     "Unexpected AMF3 type with incorrect message type")
 
             return decoder.readElement()
 
-        if type_byte != '\x0a':
+        if type_byte != b'\x0a':
             raise pyamf.DecodeError("Array type required for request body")
 
         stream.read(1)
@@ -517,7 +513,7 @@ def _write_body(name, message, stream, encoder, strict=False):
 
             return
 
-        stream.write('\x0a')
+        stream.write(b'\x0a')
         stream.write_ulong(len(message.body))
         for x in message.body:
             encoder.writeElement(x)
@@ -528,7 +524,7 @@ def _write_body(name, message, stream, encoder, strict=False):
     target = None
 
     if isinstance(message, Request):
-        target = unicode(message.target)
+        target = str(message.target)
     else:
         target = u"%s%s" % (name, _get_status(message.status))
 
@@ -594,7 +590,7 @@ def get_fault(data):
     e = {}
 
     for x, y in data.items():
-        if isinstance(x, unicode):
+        if isinstance(x, str):
             e[str(x)] = y
         else:
             e[x] = y
