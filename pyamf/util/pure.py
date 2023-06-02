@@ -36,16 +36,13 @@ class BytesIOProxy(object):
         """
         self._buffer = BytesIO()
 
-        if isinstance(buf, str):
-            self._buffer.write(buf.encode())
-        elif isinstance(buf, bytes):
+        if isinstance(buf, bytes):
             self._buffer.write(buf)
-        elif hasattr(buf, 'getvalue'):
+        elif isinstance(buf, str):
+            self._buffer.write(buf.encode())
+        elif hasattr(buf, "getvalue"):
             self._buffer.write(buf.getvalue())
-        elif (
-                hasattr(buf, 'read') and
-                hasattr(buf, 'seek') and
-                hasattr(buf, 'tell')):
+        elif hasattr(buf, "read") and hasattr(buf, "seek") and hasattr(buf, "tell"):
             old_pos = buf.tell()
             buf.seek(0)
             self._buffer.write(buf.read())
@@ -68,10 +65,9 @@ class BytesIOProxy(object):
         Reads C{n} bytes from the stream.
         """
         if n < -1:
-            raise IOError('Cannot read backwards')
+            raise IOError("Cannot read backwards")
 
-        bytes = self._buffer.read(n)
-        return bytes
+        return self._buffer.read(n)
 
     def seek(self, pos, mode=0):
         """
@@ -119,6 +115,8 @@ class BytesIOProxy(object):
 
         @param s: Raw bytes
         """
+        if isinstance(s, str):
+            s = s.encode()
         self._buffer.write(s)
         self._len_changed = True
 
@@ -126,7 +124,7 @@ class BytesIOProxy(object):
         """
         Return total number of bytes in buffer.
         """
-        if hasattr(self._buffer, 'len'):
+        if hasattr(self._buffer, "len"):
             self._len = self._buffer.len
 
             return
@@ -150,13 +148,12 @@ class BytesIOProxy(object):
         """
         Chops the tail off the stream starting at 0 and ending at C{tell()}.
         The stream pointer is set to 0 at the end of this function.
-
         @since: 0.4
         """
         try:
             bytes = self.read()
         except IOError:
-            bytes = ''
+            bytes = ""
 
         self.truncate()
 
@@ -187,7 +184,7 @@ class DataTypeMixIn(object):
     #: Big endian
     ENDIAN_BIG = ">"
 
-    endian = ENDIAN_NETWORK
+    __endian = ENDIAN_NETWORK
 
     @property
     def endian(self):
@@ -218,10 +215,7 @@ class DataTypeMixIn(object):
         if self.endian == DataTypeMixIn.ENDIAN_NATIVE:
             return SYSTEM_ENDIAN == DataTypeMixIn.ENDIAN_BIG
 
-        return self.endian in (
-            DataTypeMixIn.ENDIAN_BIG,
-            DataTypeMixIn.ENDIAN_NETWORK
-        )
+        return self.endian in (DataTypeMixIn.ENDIAN_BIG, DataTypeMixIn.ENDIAN_NETWORK)
 
     def read_uchar(self):
         """
@@ -232,14 +226,13 @@ class DataTypeMixIn(object):
     def write_uchar(self, c):
         """
         Writes an C{unsigned char} to the stream.
-
         @param c: Unsigned char
         @type c: C{int}
         @raise TypeError: Unexpected type for int C{c}.
         @raise OverflowError: Not in range.
         """
         if type(c) not in python.int_types:
-            raise TypeError('expected an int (got:%r)' % type(c))
+            raise TypeError("expected an int (got:%r)" % type(c))
 
         if not 0 <= c <= 255:
             raise OverflowError("Not in range, %d" % c)
@@ -255,14 +248,13 @@ class DataTypeMixIn(object):
     def write_char(self, c):
         """
         Write a C{char} to the stream.
-
         @param c: char
         @type c: C{int}
         @raise TypeError: Unexpected type for int C{c}.
         @raise OverflowError: Not in range.
         """
         if type(c) not in python.int_types:
-            raise TypeError('expected an int (got:%r)' % type(c))
+            raise TypeError("expected an int (got:%r)" % type(c))
 
         if not -128 <= c <= 127:
             raise OverflowError("Not in range, %d" % c)
@@ -278,14 +270,13 @@ class DataTypeMixIn(object):
     def write_ushort(self, s):
         """
         Writes a 2 byte unsigned integer to the stream.
-
         @param s: 2 byte unsigned integer
         @type s: C{int}
         @raise TypeError: Unexpected type for int C{s}.
         @raise OverflowError: Not in range.
         """
         if type(s) not in python.int_types:
-            raise TypeError('expected an int (got:%r)' % (type(s),))
+            raise TypeError("expected an int (got:%r)" % (type(s),))
 
         if not 0 <= s <= 65535:
             raise OverflowError("Not in range, %d" % s)
@@ -301,14 +292,13 @@ class DataTypeMixIn(object):
     def write_short(self, s):
         """
         Writes a 2 byte integer to the stream.
-
         @param s: 2 byte integer
         @type s: C{int}
         @raise TypeError: Unexpected type for int C{s}.
         @raise OverflowError: Not in range.
         """
         if type(s) not in python.int_types:
-            raise TypeError('expected an int (got:%r)' % (type(s),))
+            raise TypeError("expected an int (got:%r)" % (type(s),))
 
         if not -32768 <= s <= 32767:
             raise OverflowError("Not in range, %d" % s)
@@ -324,14 +314,13 @@ class DataTypeMixIn(object):
     def write_ulong(self, l):
         """
         Writes a 4 byte unsigned integer to the stream.
-
         @param l: 4 byte unsigned integer
         @type l: C{int}
         @raise TypeError: Unexpected type for int C{l}.
         @raise OverflowError: Not in range.
         """
         if type(l) not in python.int_types:
-            raise TypeError('expected an int (got:%r)' % (type(l),))
+            raise TypeError("expected an int (got:%r)" % (type(l),))
 
         if not 0 <= l <= 4294967295:
             raise OverflowError("Not in range, %d" % l)
@@ -347,14 +336,13 @@ class DataTypeMixIn(object):
     def write_long(self, l):
         """
         Writes a 4 byte integer to the stream.
-
         @param l: 4 byte integer
         @type l: C{int}
         @raise TypeError: Unexpected type for int C{l}.
         @raise OverflowError: Not in range.
         """
         if type(l) not in python.int_types:
-            raise TypeError('expected an int (got:%r)' % (type(l),))
+            raise TypeError("expected an int (got:%r)" % (type(l),))
 
         if not -2147483648 <= l <= 2147483647:
             raise OverflowError("Not in range, %d" % l)
@@ -364,7 +352,6 @@ class DataTypeMixIn(object):
     def read_24bit_uint(self):
         """
         Reads a 24 bit unsigned integer from the stream.
-
         @since: 0.4
         """
         order = None
@@ -377,14 +364,13 @@ class DataTypeMixIn(object):
         n = 0
 
         for x in order:
-            n += (self.read_uchar() << x)
+            n += self.read_uchar() << x
 
         return n
 
     def write_24bit_uint(self, n):
         """
         Writes a 24 bit unsigned integer to the stream.
-
         @since: 0.4
         @param n: 24 bit unsigned integer
         @type n: C{int}
@@ -392,9 +378,9 @@ class DataTypeMixIn(object):
         @raise OverflowError: Not in range.
         """
         if type(n) not in python.int_types:
-            raise TypeError('expected an int (got:%r)' % (type(n),))
+            raise TypeError("expected an int (got:%r)" % (type(n),))
 
-        if not 0 <= n <= 0xffffff:
+        if not 0 <= n <= 0xFFFFFF:
             raise OverflowError("n is out of range")
 
         order = None
@@ -405,12 +391,11 @@ class DataTypeMixIn(object):
             order = [16, 8, 0]
 
         for x in order:
-            self.write_uchar((n >> x) & 0xff)
+            self.write_uchar((n >> x) & 0xFF)
 
     def read_24bit_int(self):
         """
         Reads a 24 bit integer from the stream.
-
         @since: 0.4
         """
         n = self.read_24bit_uint()
@@ -424,7 +409,6 @@ class DataTypeMixIn(object):
     def write_24bit_int(self, n):
         """
         Writes a 24 bit integer to the stream.
-
         @since: 0.4
         @param n: 24 bit integer
         @type n: C{int}
@@ -432,7 +416,7 @@ class DataTypeMixIn(object):
         @raise OverflowError: Not in range.
         """
         if type(n) not in python.int_types:
-            raise TypeError('expected an int (got:%r)' % (type(n),))
+            raise TypeError("expected an int (got:%r)" % (type(n),))
 
         if not -8388608 <= n <= 8388607:
             raise OverflowError("n is out of range")
@@ -448,7 +432,7 @@ class DataTypeMixIn(object):
             n += 0x1000000
 
         for x in order:
-            self.write_uchar((n >> x) & 0xff)
+            self.write_uchar((n >> x) & 0xFF)
 
     def read_double(self):
         """
@@ -459,13 +443,12 @@ class DataTypeMixIn(object):
     def write_double(self, d):
         """
         Writes an 8 byte float to the stream.
-
         @param d: 8 byte float
         @type d: C{float}
         @raise TypeError: Unexpected type for float C{d}.
         """
         if not type(d) is float:
-            raise TypeError('expected a float (got:%r)' % (type(d),))
+            raise TypeError("expected a float (got:%r)" % (type(d),))
 
         self.write(struct.pack("%sd" % self.endian, d))
 
@@ -478,38 +461,32 @@ class DataTypeMixIn(object):
     def write_float(self, f):
         """
         Writes a 4 byte float to the stream.
-
         @param f: 4 byte float
         @type f: C{float}
         @raise TypeError: Unexpected type for float C{f}.
         """
         if type(f) is not float:
-            raise TypeError('expected a float (got:%r)' % (type(f),))
+            raise TypeError("expected a float (got:%r)" % (type(f),))
 
         self.write(struct.pack("%sf" % self.endian, f))
 
     def read_utf8_string(self, length):
         """
         Reads a UTF-8 string from the stream.
-
         @rtype: C{unicode}
         """
-        s = struct.unpack("%s%ds" % (
-            self.endian, length),
-            self.read(length)
-        )
+        s = struct.unpack("%s%ds" % (self.endian, length), self.read(length))
 
-        return s[0].decode('utf-8')
+        return s[0].decode("utf-8")
 
     def write_utf8_string(self, u):
         """
         Writes a unicode object to the stream in UTF-8.
-
         @param u: unicode object
         @raise TypeError: Unexpected type for str C{u}.
         """
-        if not isinstance(u, bytes):
-            raise TypeError('Expected %r, got %r' % (bytes, u))
+        if not isinstance(u, python.str_types):
+            raise TypeError("Expected %r, got %r" % (python.str_types, u))
 
         bytes = u
 
@@ -521,7 +498,7 @@ class DataTypeMixIn(object):
 
 class BufferedByteStream(BytesIOProxy, DataTypeMixIn):
     """
-    An extension of C{BytesIO}.
+    An extension of C{StringIO}.
 
     Features:
      - Raises L{IOError} if reading past end.
@@ -531,7 +508,7 @@ class BufferedByteStream(BytesIOProxy, DataTypeMixIn):
     def __init__(self, buf=None, min_buf_size=None):
         """
         @param buf: Initial byte stream.
-        @type buf: C{str} or C{BytesIO} instance
+        @type buf: C{str} or C{StringIO} instance
         @param min_buf_size: Ignored in the pure Python version.
         """
         BytesIOProxy.__init__(self, buf=buf)
@@ -544,12 +521,11 @@ class BufferedByteStream(BytesIOProxy, DataTypeMixIn):
         @raise IOError: Attempted to read past the end of the buffer.
         """
         if length == -1 and self.at_eof():
-            raise IOError(
-                'Attempted to read from the buffer but already at the end')
+            raise IOError("Attempted to read from the buffer but already at the end")
         elif length > 0 and self.tell() + length > len(self):
             raise IOError(
-                'Attempted to read %d bytes from the buffer but only %d '
-                'remain' % (length, len(self) - self.tell())
+                "Attempted to read %d bytes from the buffer but only %d "
+                "remain" % (length, len(self) - self.tell())
             )
 
         return BytesIOProxy.read(self, length)
@@ -571,7 +547,7 @@ class BufferedByteStream(BytesIOProxy, DataTypeMixIn):
         if size < -1:
             raise ValueError("Cannot peek backwards")
 
-        bytes = ''
+        bytes = b""
         pos = self.tell()
 
         while not self.at_eof() and len(bytes) != size:
@@ -612,7 +588,7 @@ class BufferedByteStream(BytesIOProxy, DataTypeMixIn):
         # seek to the end of the stream
         self.seek(0, 2)
 
-        if hasattr(data, 'getvalue'):
+        if hasattr(data, "getvalue"):
             self.write_utf8_string(data.getvalue())
         else:
             self.write_utf8_string(data)
@@ -647,12 +623,14 @@ def is_float_broken():
     @return: Boolean indicating whether floats are broken on this platform.
     """
     return str(python.NaN) != str(
-        struct.unpack("!d", b'\xff\xf8\x00\x00\x00\x00\x00\x00')[0])
+        struct.unpack("!d", b"\xff\xf8\x00\x00\x00\x00\x00\x00")[0]
+    )
 
 
 # init the module from here ..
 
 if is_float_broken():
+
     def read_double_workaround(self):
         """
         Override the L{DataTypeMixIn.read_double} method to fix problems
@@ -661,22 +639,22 @@ if is_float_broken():
         bytes = self.read(8)
 
         if self._is_big_endian():
-            if bytes == '\xff\xf8\x00\x00\x00\x00\x00\x00':
+            if bytes == "\xff\xf8\x00\x00\x00\x00\x00\x00":
                 return python.NaN
 
-            if bytes == '\xff\xf0\x00\x00\x00\x00\x00\x00':
+            if bytes == "\xff\xf0\x00\x00\x00\x00\x00\x00":
                 return python.NegInf
 
-            if bytes == '\x7f\xf0\x00\x00\x00\x00\x00\x00':
+            if bytes == "\x7f\xf0\x00\x00\x00\x00\x00\x00":
                 return python.PosInf
         else:
-            if bytes == '\x00\x00\x00\x00\x00\x00\xf8\xff':
+            if bytes == "\x00\x00\x00\x00\x00\x00\xf8\xff":
                 return python.NaN
 
-            if bytes == '\x00\x00\x00\x00\x00\x00\xf0\xff':
+            if bytes == "\x00\x00\x00\x00\x00\x00\xf0\xff":
                 return python.NegInf
 
-            if bytes == '\x00\x00\x00\x00\x00\x00\xf0\x7f':
+            if bytes == "\x00\x00\x00\x00\x00\x00\xf0\x7f":
                 return python.PosInf
 
         return struct.unpack("%sd" % self.endian, bytes)[0]
@@ -691,23 +669,23 @@ if is_float_broken():
         @raise TypeError: Unexpected type for float C{d}.
         """
         if type(d) is not float:
-            raise TypeError('expected a float (got:%r)' % (type(d),))
+            raise TypeError("expected a float (got:%r)" % (type(d),))
 
         if python.isNaN(d):
             if self._is_big_endian():
-                self.write('\xff\xf8\x00\x00\x00\x00\x00\x00')
+                self.write("\xff\xf8\x00\x00\x00\x00\x00\x00")
             else:
-                self.write('\x00\x00\x00\x00\x00\x00\xf8\xff')
+                self.write("\x00\x00\x00\x00\x00\x00\xf8\xff")
         elif python.isNegInf(d):
             if self._is_big_endian():
-                self.write('\xff\xf0\x00\x00\x00\x00\x00\x00')
+                self.write("\xff\xf0\x00\x00\x00\x00\x00\x00")
             else:
-                self.write('\x00\x00\x00\x00\x00\x00\xf0\xff')
+                self.write("\x00\x00\x00\x00\x00\x00\xf0\xff")
         elif python.isPosInf(d):
             if self._is_big_endian():
-                self.write('\x7f\xf0\x00\x00\x00\x00\x00\x00')
+                self.write("\x7f\xf0\x00\x00\x00\x00\x00\x00")
             else:
-                self.write('\x00\x00\x00\x00\x00\x00\xf0\x7f')
+                self.write("\x00\x00\x00\x00\x00\x00\xf0\x7f")
         else:
             write_double_workaround.old_func(self, d)
 
@@ -716,7 +694,7 @@ if is_float_broken():
     write_double_workaround.old_func = x
 
 
-if struct.pack('@H', 1)[0] == '\x01':
+if struct.pack("@H", 1)[0] == "\x01":
     SYSTEM_ENDIAN = DataTypeMixIn.ENDIAN_LITTLE
 else:
     SYSTEM_ENDIAN = DataTypeMixIn.ENDIAN_BIG
