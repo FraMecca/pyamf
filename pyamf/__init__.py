@@ -481,17 +481,7 @@ def _get_amf_module(version, use_ext=None):
     if module_name not in ['amf0', 'amf3']:
         raise ValueError('Invalid AMF version: %r specified' % (version,))
 
-    if use_ext is None:
-        # try to use the extension but fallback gracefully
-        try:
-            module = __import__('cpyamf.' + module_name)
-        except ImportError:
-            module = __import__('pyamf.' + module_name)
-    elif not use_ext:
-        module = __import__('pyamf.' + module_name)
-    else:
-        module = __import__('cpyamf.' + module_name)
-
+    module = __import__('pyamf.' + module_name)
     return getattr(module, module_name)
 
 
