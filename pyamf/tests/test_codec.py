@@ -12,14 +12,6 @@ import unittest
 import pyamf
 from pyamf import codec
 
-try:
-    unicode
-except NameError:
-    # py3k
-    unicode = str
-    str = bytes
-
-
 class TestObject(object):
     def __init__(self):
         self.name = 'test'
@@ -240,7 +232,7 @@ class ContextTestCase(unittest.TestCase):
         s = 'foo'.encode('ascii')
         u = self.context.getStringForBytes(s)
 
-        self.assertTrue(type(u) is unicode)
+        self.assertTrue(isinstance(u, type('asd')))
         self.assertEqual(u, s.decode('ascii'))
 
         i = self.context.getStringForBytes(s)
@@ -258,7 +250,7 @@ class ContextTestCase(unittest.TestCase):
 
         b = self.context.getBytesForString(s)
 
-        self.assertTrue(type(b) is str)
+        self.assertTrue(type(b) is type(b'asd'))
         self.assertEqual(b, s.encode('ascii'))
 
         i = self.context.getBytesForString(s)

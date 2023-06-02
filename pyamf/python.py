@@ -17,28 +17,14 @@ func_types = (
     types.BuiltinFunctionType, types.BuiltinMethodType, types.CodeType,
     types.FunctionType, types.GeneratorType, types.LambdaType, types.MethodType
 )
-class_types = [type]
-int_types = [int]
 
-try:
-    int_types.append(long)
-except NameError:
-    pass
-
-try:
-    class_types.append(types.ClassType)
-except:
-    pass
-
-
-int_types = tuple(int_types)
-class_types = tuple(class_types)
-
+class_types = (type, )
+int_types = (int, )
+str_types = (str, bytes)
 PosInf = 1e300000
 NegInf = -1e300000
 # we do this instead of float('nan') because windows throws a wobbler.
 NaN = PosInf / PosInf
-
 
 def isNaN(val):
     """
@@ -61,11 +47,9 @@ def isNegInf(val):
     return str(float(val)) == str(NegInf)
 
 
-try:
-    callable = builtins.callable
-except NameError:
-    def callable(obj):
-        """
-        Compatibility function for Python 3.x
-        """
-        return hasattr(obj, '__call__')
+def callable(obj):
+    """
+    Compatibility function for Python 3.x
+    """
+    from typing import Callable
+    return isinstance(obj, Callable) or hasattr(obj, '__call__') # TODO: can remove second cond
