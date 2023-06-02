@@ -56,7 +56,6 @@ def setup_package():
         keywords=keywords.strip(),
         license=license,
         packages=find_packages(),
-        ext_modules=setupinfo.get_extensions(),
         install_requires=setupinfo.get_install_requirements(),
         tests_require=setupinfo.get_test_requirements(),
         test_suite="pyamf.tests.get_suite",

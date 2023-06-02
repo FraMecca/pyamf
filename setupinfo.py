@@ -47,19 +47,6 @@ class MyDistribution(Distribution):
             self.script_args.pop(i)
 
 
-class MyBuildExt(build_ext):
-    """
-    The companion to L{MyDistribution} that checks to see if building the
-    extensions are disabled.
-    """
-
-    def run(self, *args, **kwargs):
-        if self.distribution.disable_ext:
-            return
-
-        build_ext.run(self, *args, **kwargs)
-
-
 class MySDist(sdist.sdist):
     """
     We generate the Cython code for a source distribution
@@ -152,7 +139,6 @@ def extra_setup_args():
         'distclass': MyDistribution,
         'cmdclass': {
             'test': TestCommand,
-            'build_ext': MyBuildExt,
             'sdist': MySDist
         },
         'package_data': get_package_data(),
@@ -168,10 +154,6 @@ def get_install_requirements():
 
     if sys.version_info < (2, 5):
         install_requires.extend(["elementtree>=1.2.6", "uuid>=1.30"])
-
-    if 'dev' in get_version():
-        if can_compile_extensions:
-            install_requires.extend(['Cython>=0.13'])
 
     return install_requires
 
@@ -240,30 +222,7 @@ def get_extensions():
     """
     Return a list of Extension instances that can be compiled.
     """
-    if not can_compile_extensions:
-        print(80 * '*')
-        print('WARNING:')
-        print(
-            '\tAn optional code optimization (C extension) could not be '
-            'compiled.\n\n'
-        )
-        print('\tOptimizations for this package will not be available!\n\n')
-        print('Compiling extensions is not supported on %r' % (sys.platform,))
-        print(80 * '*')
-
-        return []
-
-    extensions = []
-
-    for p in recursive_glob('.', '*.pyx'):
-        mod_name = os.path.splitext(p)[0].replace(os.path.sep, '.')
-
-        e = make_extension(mod_name)
-
-        if e:
-            extensions.append(e)
-
-    return extensions
+    return []
 
 
 def get_trove_classifiers():
